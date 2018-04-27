@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+        <title>CodingDojo - The Wall</title>
+    </head>
+    <script>
+        
+
+    </script>
+    <body>
+        <div id="container">
+            <header class="header_footer">
+                <img src="{{ url_for('static', filename='Coding-Dojo-logo.png') }}">
+                <h1>CodingDojo - The Wall</h1>
+            </header>
+            <main>
+                <div id="forms">
+                    <h2>Please, register or log in!</h2>
+                      {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                          {% for message in messages %}
+                            <p>{{message}}</p>
+                          {% endfor %}
+                        {% endif %}
+                      {% endwith %}
+                      <div class="session">
+                        <h3>Register here</h3>
+                        <form action='/register' method='POST' id="form1"> 
+                            <label for="first_name">First Name:<input type="text" name="first_name" id="first_name"></label>
+                            <label for="last_name">Last Name:<input type="text" name="last_name" id="last_name"></label>
+                            <label for="email">E-mail Address:<input type="email" name="email" id="email"></label>
+                            <label for="password">Password:<input type="password" name="password" id="password"></label>
+                            <label for="confirm_password">Confirm Password:<input type="password" name="confirm_password" id="confirm_password"></label>
+                            <input type="submit" value="Register" class="button">
+                        </form>
+                    </div>
+                    <div class="session">
+                        <h3>Log in here</h3>
+                        <form action='/login' method='POST' id="form1"> 
+                            <label for="email">E-mail Address:<input type="email" name="email" id="email"></label>
+                            <label for="password">Password:<input type="password" name="password" id="password"></label>
+                            <input type="submit" value="Log in" class="button">
+                        </form>
+                    </div>
+                </div>
+            </main>
+            <footer class="header_footer">
+                <h3>Katia Cavalcanti</h3>
+            </footer>
+        </div>
+    </body>
+</html>

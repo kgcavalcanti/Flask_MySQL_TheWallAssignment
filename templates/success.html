@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+        <title>E-mails - Assignment</title>
+    </head>
+    <script>
+        
+
+    </script>
+    <body>
+        <div id="container">
+            <header class="header_footer">
+                <img src="{{ url_for('static', filename='Coding-Dojo-logo.png') }}">
+                <h1>Flask MySQL Assignment - E-mails</h1>
+            </header>
+            <main>
+                <h2 class="change1">CodingDojo - Wall</h2>
+                <p class="change1">{{ session['fname'] }} {{ session['lname'] }}</p>
+                <p class="change1"><a href="/logoff" class="change">Log off</a></p>
+                <div id="forms2">
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                          {% for message in messages %}
+                            <p>{{message}}</p>
+                          {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <form action="/postmessage" method="POST"> 
+                        <label for="message">Post a message</label>
+                        <textarea name="message" id="message" cols="115" rows="4"></textarea>
+                        <input type="submit" name="submit" value="Post message" class="button1">
+                    </form>
+                    {% for post in postmessages%}
+                        <p class="sytlep1">{{post['first_name']}} {{post['last_name']}} - {{post['updated_at']}}</p>
+                        <p class="sytlep">{{post['message']}}</p>
+                        <form action="/postcomment" method="POST"> 
+                            <label for="comment" class="stylecomment">Post a comment</label>
+                            <textarea name="comment" id="comment" cols="110" rows="4" class="stylecomment"></textarea>
+                            <input type="submit" name="submit" value="Post comment" class="button1 stylecomment">
+                        </form>
+                    {% endfor %}
+                </div>
+                   
+            </main>
+            <footer class="header_footer">
+                <h3>Katia Cavalcanti</h3>
+            </footer>
+        </div>
+    </body>
+</html>
