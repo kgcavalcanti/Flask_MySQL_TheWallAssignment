@@ -7,9 +7,11 @@ app = Flask(__name__)
 app.secret_key = 'iasoeriua8w4raeirua'
 mysql = MySQLConnector(app,'thewalldb')
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 
 @app.route('/register', methods=['POST'])
@@ -42,16 +44,13 @@ def insert():
             'email': request.form['email']
         }
         response = mysql.query_db(query_select, data_select)
-        print response
         session['id'] = response[0]['id']
         session['fname'] = response[0]['first_name']
         session['lname'] = response[0]['last_name']
-        print session['id']
-        query_select = "SELECT messages.message, DATE_FORMAT(messages.updated_at,'%c/%d/%y %r') AS updated_at, users.first_name, users.last_name FROM users JOIN messages ON users.id = messages.user_id ORDER BY messages.updated_at DESC"
-        messages = mysql.query_db(query_select)
-        return render_template ('success.html', postmessages=messages)
+        return redirect ('/wall')
     else:
         return redirect('/')
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -72,18 +71,24 @@ def login():
             return redirect('/') 
         else:
             session['id'] = user[0]['id']
-            query_select = "SELECT first_name, last_name FROM users WHERE id = :id"
-            data_select = {
-                'id': session['id'],
-            }
-            response = mysql.query_db(query_select, data_select)
-            session['fname'] = response[0]['first_name']
-            session['lname'] = response[0]['last_name']
-            # flash("Welcome {} {}" .format(response[0]['first_name'],response[0]['last_name']))
-            print response
-            query_select = "SELECT messages.message, DATE_FORMAT(messages.updated_at,'%c/%d/%y %r') AS updated_at, users.first_name, users.last_name FROM users JOIN messages ON users.id = messages.user_id ORDER BY messages.updated_at DESC"
-            messages = mysql.query_db(query_select)
-            return render_template('success.html', postmessages=messages)
+            session['fname'] = user[0]['first_name']
+            session['lname'] = user[0]['last_name']
+            response = mysql.query_db(query_select, data_select)           
+            return redirect('/wall')
+
+
+
+@app.route('/wall')
+def wall():
+    query_comments = "SELECT comments.id AS comment_id, comments.message_id AS message_id, DATE_FORMAT(comments.updated_at, '%M %d %y %r') AS comment_updated, comments.comment, CONCAT_WS(' ', users.first_name,users.last_name) AS comment_full_name FROM comments JOIN users ON comments.user_id = users.id ORDER BY comments.updated_at DESC"
+    comments = mysql.query_db(query_comments)
+    print comments
+    query_messages = "SELECT messages.id AS message_id, messages.message, DATE_FORMAT(messages.updated_at, '%M %d %y %r') AS message_updated, CONCAT_WS(' ', users.first_name,users.last_name) AS message_full_name FROM messages JOIN users ON messages.user_id = users.id ORDER BY messages.updated_at DESC"
+    messages = mysql.query_db(query_messages)
+    print messages
+    return render_template('success.html', postmessages=messages, postcomments=comments)
+
+
 
 @app.route('/postmessage', methods=['POST'])
 def message():
@@ -99,25 +104,27 @@ def message():
         print data_insert
         mysql.query_db(query_insert,data_insert)
         flash("Message posted")
-        query_select = "SELECT messages.message, DATE_FORMAT(messages.updated_at,'%c/%d/%y %r') AS updated_at , users.first_name, users.last_name FROM users JOIN messages ON users.id = messages.user_id ORDER BY messages.updated_at DESC"
-        messages = mysql.query_db(query_select)
+    return redirect('/wall')
 
-    return render_template('success.html', postmessages=messages)
 
-@app.route('/postcomment', methods=['POST'])
-def comment():
 
+@app.route('/postcomment/<message_id>', methods=['POST'])
+def comment(message_id):
     if len(request.form['comment']) < 1:
         flash("Message cannot be empty")
     else:
-        query_insert = "INSERT INTO comments (user_id, message_id, comment, created_at, updated_at) VALUES (:user_id, :message_id, comment, now(), now())"
+        query_insert = "INSERT INTO comments (user_id, message_id, comment, created_at, updated_at) VALUES (:user_id, :message_id, :comment, now(), now())"
         data_insert = {
             'user_id': session['id'],
-            'message_id': ...,
-            'comment': request.form['comment']
+            'message_id': message_id,
+            'comment': request.form['comment'],
         }
+
+
+        print data_insert
         mysql.query_db(query_insert,data_insert)
         flash("Comment posted!")
-    return render_template('success.html')
+    return redirect('/wall')
+
 
 app.run(debug=True)
