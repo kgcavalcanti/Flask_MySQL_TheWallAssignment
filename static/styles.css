@@ -136,3 +136,12 @@ footer h3 {
     margin-left: 35px;
 }
 
+.edita{
+    text-decoration: none;
+    text-align: right;
+}
+
+#formcomment {
+    margin-top: 10px;
+}
+

@@ -39,14 +39,13 @@ def insert():
                }
         print data_insert
         mysql.query_db(query_insert, data_insert)
-        query_select = "SELECT id, first_name, last_name FROM users WHERE email = :email"
+        query_select = "SELECT id, CONCAT_WS(' ', first_name, last_name) AS full_name FROM users WHERE email = :email"
         data_select = {
             'email': request.form['email']
         }
-        response = mysql.query_db(query_select, data_select)
-        session['id'] = response[0]['id']
-        session['fname'] = response[0]['first_name']
-        session['lname'] = response[0]['last_name']
+        user = mysql.query_db(query_select, data_select)
+        session['id'] = user[0]['id']
+        session['full_name'] = user[0]['full_name']
         return redirect ('/wall')
     else:
         return redirect('/')
@@ -60,7 +59,7 @@ def login():
         valid = False
         return redirect('/') 
     if valid == True:
-        query_select = "SELECT * FROM users WHERE email = :email AND password = :password"
+        query_select = "SELECT id, CONCAT_WS(' ', first_name, last_name) AS full_name FROM users WHERE email = :email AND password = :password"
         data_select = {
             'email': request.form['email'],
             'password': md5.new(request.form['password']).hexdigest(),
@@ -71,8 +70,7 @@ def login():
             return redirect('/') 
         else:
             session['id'] = user[0]['id']
-            session['fname'] = user[0]['first_name']
-            session['lname'] = user[0]['last_name']
+            session['full_name'] = user[0]['full_name']
             response = mysql.query_db(query_select, data_select)           
             return redirect('/wall')
 
@@ -124,6 +122,23 @@ def comment(message_id):
         print data_insert
         mysql.query_db(query_insert,data_insert)
         flash("Comment posted!")
+    return redirect('/wall')
+
+
+@app.route('/deletemessage/<message_id>')
+def delete_message(message_id):
+    
+    query_deletecomments = "DELETE FROM comments WHERE message_id = :specific_id"
+    data_delete = {
+        'specific_id': message_id,
+    }
+    mysql.query_db(query_deletecomments,data_delete)
+    query_deletemessages = "DELETE FROM messages WHERE id = :specific_id"
+    data_delete = {
+        'specific_id': message_id,
+    }
+    mysql.query_db(query_deletemessages,data_delete)
+    flash("Message deleted!")
     return redirect('/wall')
 
 

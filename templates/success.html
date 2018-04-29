@@ -19,7 +19,7 @@
             </header>
             <main>
                 <h2 class="change1">CodingDojo - Wall</h2>
-                <p class="change1">{{ session['fname'] }} {{ session['lname'] }}</p>
+                <p class="change1">{{ session['full_name'] }}</p>
                 <p class="change1"><a href="/logoff" class="change">Log off</a></p>
                 <div id="forms2">
                     {% with messages = get_flashed_messages() %}
@@ -37,13 +37,16 @@
                     {% for message in postmessages%}
                         <p class="sytlep1">{{message['message_full_name']}} - {{message['message_updated']}}</p>
                         <p>{{message['message']}}</p>
+                        {% if message['message_full_name'] == session['full_name'] %}
+                            <a href="/deletemessage/{{message['message_id']}}" id="edita">Delete Message</a>
+                        {% endif %}   
                         {% for comment in postcomments%}
                                 {% if message['message_id'] == comment['message_id'] %}
                                 <p class="sytlepcomment sytlep1">{{comment['comment_full_name']}} - {{comment['comment_updated']}}</p>
                                 <p class="sytlepcomment">{{comment['comment']}}</p>                        
                             {% endif %}
                         {% endfor %}
-                        <form action="/postcomment/{{message['message_id']}}" method="POST"> 
+                        <form action="/postcomment/{{message['message_id']}}" method="POST" id="formcomment"> 
                             <label for="comment" class="sytlepcomment">Post a comment</label>
                             <textarea name="comment" id="comment" cols="105" rows="4" class="sytlepcomment"></textarea>
                             <input type="submit" name="submit" value="Post comment" class="button1 sytlepcomment">
