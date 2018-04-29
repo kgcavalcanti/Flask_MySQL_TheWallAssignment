@@ -141,5 +141,9 @@ def delete_message(message_id):
     flash("Message deleted!")
     return redirect('/wall')
 
+@app.route('/logoff')
+def logoff():
+    session.clear()
+    return render_template('index.html')
 
 app.run(debug=True)
