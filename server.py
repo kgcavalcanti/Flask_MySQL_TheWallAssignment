@@ -2,6 +2,7 @@ from flask import Flask, request, redirect, render_template, session, flash
 from mysqlconnection import MySQLConnector
 import re
 import md5
+from datetime import datetime 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 app = Flask(__name__)
 app.secret_key = 'iasoeriua8w4raeirua'
@@ -111,10 +112,10 @@ def comment(message_id):
     if len(request.form['comment']) < 1:
         flash("Message cannot be empty")
     else:
-        query_insert = "INSERT INTO comments (user_id, message_id, comment, created_at, updated_at) VALUES (:user_id, :message_id, :comment, now(), now())"
+        query_insert = "INSERT INTO comments (user_id, message_id, comment, created_at, updated_at) VALUES (:user_id, :specific_id, :comment, now(), now())"
         data_insert = {
             'user_id': session['id'],
-            'message_id': message_id,
+            'specific_id': message_id,
             'comment': request.form['comment'],
         }
 
@@ -127,7 +128,6 @@ def comment(message_id):
 
 @app.route('/deletemessage/<message_id>')
 def delete_message(message_id):
-    
     query_deletecomments = "DELETE FROM comments WHERE message_id = :specific_id"
     data_delete = {
         'specific_id': message_id,
